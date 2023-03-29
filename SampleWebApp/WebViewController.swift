@@ -15,18 +15,6 @@ struct URLConstants {
     static let schemaURL = "localassets"
 }
 
-extension URL {
-    
-    var mimeType: String {
-        return UTType(filenameExtension: self.pathExtension)?.preferredMIMEType ?? "application/octet-stream"
-    }
-    
-    func contains(_ uttype: UTType) -> Bool {
-        return UTType(mimeType: self.mimeType)?.conforms(to: uttype) ?? false
-    }
-
-}
-
 class WebViewController: UIViewController {
 
     var initialURL = "http://nthunga.infinityfreeapp.com"
@@ -97,7 +85,6 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         urlSchemeTask.didReceive(response)
         urlSchemeTask.didReceive(data)
         urlSchemeTask.didFinish()
-
     }
     
     // MARK: - Private
