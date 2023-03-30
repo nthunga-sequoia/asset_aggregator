@@ -34,7 +34,6 @@ class WebViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupWebview()
         loadWebPage()
     }
@@ -71,13 +70,15 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         
         guard let url = urlSchemeTask.request.url,
-              let fileUrl = fileUrlFromUrl(url),
+              let fileUrl = fileUrlFromUrlFromDocument(url), // Switch the file source here
               let mimeType = mimeType(ofFileAtUrl: fileUrl),
               let data = try? Data(contentsOf: fileUrl) else { return }
 
         let response = HTTPURLResponse(url: url,
                                        mimeType: mimeType,
                                        expectedContentLength: data.count, textEncodingName: nil)
+        
+        print("\nURL Schema Task response ---> ",response)
 
         urlSchemeTask.didReceive(response)
         urlSchemeTask.didReceive(data)
@@ -86,7 +87,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     
     // MARK: - Private
 
-    private func fileUrlFromUrl(_ url: URL) -> URL? {
+    private func fileUrlFromUrlFromBundle(_ url: URL) -> URL? {
         print("\nFile URL from URL --->", url)
         var folderName = URLConstants.SchemaURL
         
@@ -105,12 +106,72 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         return url ?? nil
     }
     
+    private func fileUrlFromUrlFromDocument(_ url: URL) -> URL? {
+        print("\nFile URL from URL --->", url)
+        
+        var folderName = URLConstants.SchemaURL
+        
+        // At first we need to pass HTML page, then each assets in the HTML file will be called for respective assets.
+        if url.absoluteString == URLConstants.TransformedURL {
+            folderName += "/" + "index.html"
+        }
+        else {
+            folderName += "/" + (url.absoluteString.components(separatedBy: ".com/").last ?? "")
+        }
+        print("\nAsset filepath --->",folderName)
+        
+        var queryFileName = ""
+        if folderName.contains("/images") {
+            queryFileName = folderName.components(separatedBy: "localassets/images/").last ?? ""
+        }
+        else {
+            queryFileName = folderName.components(separatedBy: "localassets/").last ?? ""
+        }
+        let url = fetchFileURLFromDocument(url, fileName: queryFileName) ?? nil
+        return url
+    }
+    
     private func mimeType(ofFileAtUrl url: URL) -> String? {
-        print("\nMIME type for URL --->", url)
+        //print("\nMIME type for URL --->", url)
         guard let type = UTType(filenameExtension: url.pathExtension) else {
             return nil
         }
         return type.preferredMIMEType
+    }
+    
+    private func fetchFileURLFromDocument(_ url: URL, fileName: String) -> URL? {
+        let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        
+        let documentFiles = try? FileManager.default.contentsOfDirectory(at: documentDirectory, includingPropertiesForKeys: nil)
+        if let files = documentFiles {
+            for fileUrl in files {
+                // Do something with the HTML file, such as loading it into a WebView
+                
+                if let mimeType = mimeType(ofFileAtUrl: url), mimeType == "image/jpeg" {
+                    if fileUrl.lastPathComponent != "images" {
+                        continue
+                    }
+                    let folderURL = documentDirectory.appendingPathComponent("images")
+                    do {
+                        let fileURLs = try FileManager.default.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil)
+                        let url = fileURLs.filter{$0.lastPathComponent == fileName}.first
+                        return url
+                    } catch {
+                        print("Error fetching files: \(error)")
+                    }
+                }
+                else {
+                    // check the filename & return the right
+                    if fileName == fileUrl.lastPathComponent {
+                        return fileUrl
+                    }
+                }
+            }
+        } else {
+            print("\nFileManager ---> No Files found")
+        }
+        
+        return nil
     }
 }
 
@@ -152,7 +213,7 @@ extension WebViewController {
         guard let documentUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
             return
         }
-        print(documentUrl)
+        print("\nFileManager docuent URL --->",documentUrl)
     }
     
     // 2 - Fetch file path
@@ -181,25 +242,60 @@ extension WebViewController {
         let documentDirectory = try! fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         
         //upload index.html file to Document folder
-        guard let indexFilePath = uploadFileToFileManager(path: "LocalAssets/index", type: "html") else {
+        var filePathStr = URLConstants.SchemaURL + "/index"
+        guard let indexFilePath = uploadFileToFileManager(path: filePathStr, type: "html") else {
             return
         }
         let indexURL = documentDirectory.appendingPathComponent("index.html")
         uploadToFileManager(fileManager: fileManager, source: indexFilePath, destination: indexURL)
         
         //upload style.css file to Document folder
-        guard let filePath = uploadFileToFileManager(path: "LocalAssets/style", type: "css") else {
+        filePathStr = URLConstants.SchemaURL + "/style"
+        guard let filePath = uploadFileToFileManager(path: filePathStr, type: "css") else {
             return
         }
         let destinationURL = documentDirectory.appendingPathComponent("style.css")
         uploadToFileManager(fileManager: fileManager, source: filePath, destination: destinationURL)
 
         //upload page.js file to Document folder
-        guard let filePath = uploadFileToFileManager(path: "LocalAssets/page", type: "js") else {
+        filePathStr = URLConstants.SchemaURL + "/page"
+        guard let filePath = uploadFileToFileManager(path: filePathStr, type: "js") else {
             return
         }
         let jsDestinationURL = documentDirectory.appendingPathComponent("page.js")
         uploadToFileManager(fileManager: fileManager, source: filePath, destination: jsDestinationURL)
+        
+        // Upload images to FileManager's document folder
+        uploadImagesFromBundleToFileManager()
     }
+    
+    func uploadImagesFromBundleToFileManager() {
+        // save images to document folder
+        let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let folderURL = documentDirectory.appendingPathComponent("images")
+        do {
+            try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            print("Error creating folder: \(error)")
+        }
+        
+        let imageNames = ["localassets/images/img1.jpeg", "localassets/images/img2.jpeg", "localassets/images/img3.jpeg"]
+        for imageName in imageNames {
+            if let bundleURL = Bundle.main.url(forResource: imageName, withExtension: nil) {
+                let excludeSchema = URLConstants.SchemaURL + "/images/"
+                let finalImageName = imageName.components(separatedBy: excludeSchema).last ?? ""
+                let destinationURL = folderURL.appendingPathComponent(finalImageName)
+                do {
+                    try FileManager.default.copyItem(at: bundleURL, to: destinationURL)
+                    print("\nFileManager ---> Image upload successful \(imageName)")
+                } catch {
+                    print("\nFileManager ---> Error copying \(imageName): \(error)")
+                }
+            } else {
+                print("\nFileManager ---> \(imageName) not found in bundle")
+            }
+        }
+    }
+    
 
 }
