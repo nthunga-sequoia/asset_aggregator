@@ -10,22 +10,22 @@ import WebKit
 import UniformTypeIdentifiers
 
 struct URLConstants {
-    static let loadingURL = "http://nthunga.infinityfreeapp.com"
-    static let updatedSchemaURL = "localassets://nthunga.infinityfreeapp.com"
+    static let sourceURL = "http://nthunga.infinityfreeapp.com"
+    static let transformedURL = "localassets://nthunga.infinityfreeapp.com"
     static let schemaURL = "localassets"
 }
 
 class WebViewController: UIViewController {
 
-    var initialURL = "http://nthunga.infinityfreeapp.com"
-    var targetedURL = "http://nthunga.infinityfreeapp.com"
-    var schemaURL = "localassets"
-    var updatedSchemaURL = "localassets://nthunga.infinityfreeapp.com"
+//    var sourceURL = "http://nthunga.infinityfreeapp.com"
+////    var sourceURLCopy = "http://nthunga.infinityfreeapp.com"
+//    var schemaURL = "localassets"
+//    var transformedURL = "localassets://nthunga.infinityfreeapp.com"
     
-//    var initialURL = "https://px.sequoia.com/"
+//    var sourceURL = "https://px.sequoia.com/"
 //    var targetedURL = "https://px.sequoia.com/rtw"
 //    var schemaURL = "rtw"
-//    var updatedSchemaURL = "rtw://nthunga.infinityfreeapp.com/rtw"
+//    var transformedURL = "rtw://nthunga.infinityfreeapp.com/rtw"
     
     var webview = WKWebView()
     
@@ -43,7 +43,7 @@ class WebViewController: UIViewController {
     }
     
     func loadWebPage() {
-        if let requestURL = URL(string: initialURL) {
+        if let requestURL = URL(string: URLConstants.sourceURL) {
             let URLRequest = NSMutableURLRequest(url: requestURL)
             URLRequest.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
             webview.load(URLRequest as URLRequest)
@@ -54,7 +54,7 @@ class WebViewController: UIViewController {
         let preferences = WKPreferences()
         let config = WKWebViewConfiguration()
         config.preferences = preferences
-        config.setURLSchemeHandler(ConfigHandler(), forURLScheme: schemaURL)
+        config.setURLSchemeHandler(ConfigHandler(), forURLScheme: URLConstants.schemaURL)
 //        config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
 //        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
         webview = WKWebView(frame: .zero, configuration: config)
@@ -90,18 +90,18 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     // MARK: - Private
 
     private func fileUrlFromUrl(_ url: URL) -> URL? {
-        print("\n\n\n File URL from URL ", url)
-        
+        print("\n\n\n File URL from URL --->", url)
         var folderName = URLConstants.schemaURL
-        if url.absoluteString == URLConstants.updatedSchemaURL {
+        
+        // At first we need to pass HTML page, then each assets in the HTML file will be called for respective assets.
+        if url.absoluteString == URLConstants.transformedURL {
             folderName += "/" + "index.html"
         }
         else {
             folderName += "/" + (url.absoluteString.components(separatedBy: ".com/").last ?? "")
         }
-        print("Foldername ",folderName)
+        print("Asset filepath --->",folderName)
         
-//        let queryString = url.absoluteString.components(separatedBy: ":").first
         let url = Bundle.main.url(forResource: folderName,
                                   withExtension: "",
                                   subdirectory: "")
@@ -109,7 +109,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     }
     
     private func mimeType(ofFileAtUrl url: URL) -> String? {
-        print("MIME type for URL", url)
+        print("MIME type for URL--->", url)
         guard let type = UTType(filenameExtension: url.pathExtension) else {
             return nil
         }
@@ -126,8 +126,8 @@ extension WebViewController : WKNavigationDelegate {
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
         print("\n Webview decidePolicyFor ->> \(String(describing: navigationAction.request.url?.absoluteString))")
         
-        if let urlStr = navigationAction.request.url?.absoluteString, urlStr.contains(targetedURL) {
-            webView.load(URLRequest(url: URL(string: updatedSchemaURL)!))
+        if let urlStr = navigationAction.request.url?.absoluteString, urlStr.contains(URLConstants.sourceURL) {
+            webView.load(URLRequest(url: URL(string: URLConstants.transformedURL)!))
             return WKNavigationActionPolicy.cancel
         }
         return WKNavigationActionPolicy.allow
@@ -136,8 +136,8 @@ extension WebViewController : WKNavigationDelegate {
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         print("URLAuthenticationChallenge ->> \(String(describing: webView.url?.absoluteString))")
         
-        if let urlStr = webView.url?.absoluteString, urlStr.contains(targetedURL) {
-            webView.load(URLRequest(url: URL(string: updatedSchemaURL)!))
+        if let urlStr = webView.url?.absoluteString, urlStr.contains(URLConstants.sourceURL) {
+            webView.load(URLRequest(url: URL(string: URLConstants.transformedURL)!))
             return completionHandler(URLSession.AuthChallengeDisposition.useCredential, nil)
         }
         completionHandler(URLSession.AuthChallengeDisposition.useCredential, nil)
@@ -148,19 +148,7 @@ extension WebViewController : WKNavigationDelegate {
     }
 }
 
-
-
-//if let jsData = try? Data(contentsOf: jsFileURL),
-//   let cssData = try? Data(contentsOf: cssFileURL) {
-//     let userContentController = WKUserContentController()
-//     let jsSource = WKScriptSource(source: String(data: jsData, encoding: .utf8)!, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
-//     let cssSource = WKUserScript(source: String(data: cssData, encoding: .utf8)!, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
-//     userContentController.addUserScript(jsSource)
-//     userContentController.addUserScript(cssSource)
-//     webView.configuration.userContentController = userContentController
-//}
-
-
+//MARK: — Loading assets to document folder
 extension WebViewController {
     func getDocumentURL() {
         let fileManager = FileManager.default
