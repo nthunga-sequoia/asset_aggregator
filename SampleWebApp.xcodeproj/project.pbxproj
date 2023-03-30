@@ -10,13 +10,10 @@
 		EC9AE23D29D4A2AF007A103B /* localassets in Resources */ = {isa = PBXBuildFile; fileRef = EC9AE23C29D4A2AF007A103B /* localassets */; };
 		ECAF251529C9AF6E0020F822 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF251429C9AF6E0020F822 /* AppDelegate.swift */; };
 		ECAF251729C9AF6E0020F822 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF251629C9AF6E0020F822 /* SceneDelegate.swift */; };
-		ECAF251929C9AF6E0020F822 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF251829C9AF6E0020F822 /* ViewController.swift */; };
 		ECAF251C29C9AF6E0020F822 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ECAF251A29C9AF6E0020F822 /* Main.storyboard */; };
 		ECAF251E29C9AF720020F822 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ECAF251D29C9AF720020F822 /* Assets.xcassets */; };
 		ECAF252129C9AF720020F822 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ECAF251F29C9AF720020F822 /* LaunchScreen.storyboard */; };
 		ECAF252929C9B3990020F822 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF252829C9B3990020F822 /* WebViewController.swift */; };
-		ECAF254029CAE8F00020F822 /* SchemaHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF253F29CAE8F00020F822 /* SchemaHandler.swift */; };
-		ECAF254229CAEAF20020F822 /* ReaderWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF254129CAEAF20020F822 /* ReaderWebView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,14 +21,11 @@
 		ECAF251129C9AF6E0020F822 /* SampleWebApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleWebApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECAF251429C9AF6E0020F822 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ECAF251629C9AF6E0020F822 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		ECAF251829C9AF6E0020F822 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		ECAF251B29C9AF6E0020F822 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		ECAF251D29C9AF720020F822 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ECAF252029C9AF720020F822 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ECAF252229C9AF720020F822 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ECAF252829C9B3990020F822 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
-		ECAF253F29CAE8F00020F822 /* SchemaHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaHandler.swift; sourceTree = "<group>"; };
-		ECAF254129CAEAF20020F822 /* ReaderWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,9 +66,6 @@
 				ECAF251D29C9AF720020F822 /* Assets.xcassets */,
 				ECAF251F29C9AF720020F822 /* LaunchScreen.storyboard */,
 				ECAF252229C9AF720020F822 /* Info.plist */,
-				ECAF253F29CAE8F00020F822 /* SchemaHandler.swift */,
-				ECAF254129CAEAF20020F822 /* ReaderWebView.swift */,
-				ECAF251829C9AF6E0020F822 /* ViewController.swift */,
 			);
 			path = SampleWebApp;
 			sourceTree = "<group>";
@@ -151,12 +142,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ECAF251929C9AF6E0020F822 /* ViewController.swift in Sources */,
 				ECAF251529C9AF6E0020F822 /* AppDelegate.swift in Sources */,
-				ECAF254229CAEAF20020F822 /* ReaderWebView.swift in Sources */,
 				ECAF251729C9AF6E0020F822 /* SceneDelegate.swift in Sources */,
 				ECAF252929C9B3990020F822 /* WebViewController.swift in Sources */,
-				ECAF254029CAE8F00020F822 /* SchemaHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
