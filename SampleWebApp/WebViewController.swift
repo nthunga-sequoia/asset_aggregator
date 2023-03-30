@@ -9,23 +9,20 @@ import UIKit
 import WebKit
 import UniformTypeIdentifiers
 
+// schema URL should be alway in lowercase
 struct URLConstants {
-    static let sourceURL = "http://nthunga.infinityfreeapp.com"
-    static let transformedURL = "localassets://nthunga.infinityfreeapp.com"
-    static let schemaURL = "localassets"
+    static let LoadingURL = "http://nthunga.infinityfreeapp.com"
+    static let SourceURL = "http://nthunga.infinityfreeapp.com"
+    static let TransformedURL = "localassets://nthunga.infinityfreeapp.com"
+    static let SchemaURL = "localassets"
+    
+//    static let LoadingURL = "https://px.sequoia.com/"
+//    static let SourceURL = "https://px.sequoia.com/"
+//    static let TransformedURL = "rtw://px.sequoia.com/rtw"
+//    static let SchemaURL = "rtw"
 }
 
 class WebViewController: UIViewController {
-
-//    var sourceURL = "http://nthunga.infinityfreeapp.com"
-////    var sourceURLCopy = "http://nthunga.infinityfreeapp.com"
-//    var schemaURL = "localassets"
-//    var transformedURL = "localassets://nthunga.infinityfreeapp.com"
-    
-//    var sourceURL = "https://px.sequoia.com/"
-//    var targetedURL = "https://px.sequoia.com/rtw"
-//    var schemaURL = "rtw"
-//    var transformedURL = "rtw://nthunga.infinityfreeapp.com/rtw"
     
     var webview = WKWebView()
     
@@ -43,7 +40,7 @@ class WebViewController: UIViewController {
     }
     
     func loadWebPage() {
-        if let requestURL = URL(string: URLConstants.sourceURL) {
+        if let requestURL = URL(string: URLConstants.LoadingURL) {
             let URLRequest = NSMutableURLRequest(url: requestURL)
             URLRequest.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
             webview.load(URLRequest as URLRequest)
@@ -54,7 +51,7 @@ class WebViewController: UIViewController {
         let preferences = WKPreferences()
         let config = WKWebViewConfiguration()
         config.preferences = preferences
-        config.setURLSchemeHandler(ConfigHandler(), forURLScheme: URLConstants.schemaURL)
+        config.setURLSchemeHandler(ConfigHandler(), forURLScheme: URLConstants.SchemaURL)
 //        config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
 //        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
         webview = WKWebView(frame: .zero, configuration: config)
@@ -90,11 +87,11 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     // MARK: - Private
 
     private func fileUrlFromUrl(_ url: URL) -> URL? {
-        print("\n\n\n File URL from URL --->", url)
-        var folderName = URLConstants.schemaURL
+        print("\nFile URL from URL --->", url)
+        var folderName = URLConstants.SchemaURL
         
         // At first we need to pass HTML page, then each assets in the HTML file will be called for respective assets.
-        if url.absoluteString == URLConstants.transformedURL {
+        if url.absoluteString == URLConstants.TransformedURL {
             folderName += "/" + "index.html"
         }
         else {
@@ -109,7 +106,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     }
     
     private func mimeType(ofFileAtUrl url: URL) -> String? {
-        print("MIME type for URL--->", url)
+        print("\nMIME type for URL --->", url)
         guard let type = UTType(filenameExtension: url.pathExtension) else {
             return nil
         }
@@ -120,24 +117,24 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
 extension WebViewController : WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        print("webview > didStartProvisionalNavigation")
+        print("\nWebview ---> didStartProvisionalNavigation")
     }
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
-        print("\n Webview decidePolicyFor ->> \(String(describing: navigationAction.request.url?.absoluteString))")
+        print("\nWebview decidePolicyFor ---> \(String(describing: navigationAction.request.url?.absoluteString))")
         
-        if let urlStr = navigationAction.request.url?.absoluteString, urlStr.contains(URLConstants.sourceURL) {
-            webView.load(URLRequest(url: URL(string: URLConstants.transformedURL)!))
+        if let urlStr = navigationAction.request.url?.absoluteString, urlStr.contains(URLConstants.SourceURL) {
+            webView.load(URLRequest(url: URL(string: URLConstants.TransformedURL)!))
             return WKNavigationActionPolicy.cancel
         }
         return WKNavigationActionPolicy.allow
     }
     
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        print("URLAuthenticationChallenge ->> \(String(describing: webView.url?.absoluteString))")
+        print("\nURLAuthenticationChallenge ---> \(String(describing: webView.url?.absoluteString))")
         
-        if let urlStr = webView.url?.absoluteString, urlStr.contains(URLConstants.sourceURL) {
-            webView.load(URLRequest(url: URL(string: URLConstants.transformedURL)!))
+        if let urlStr = webView.url?.absoluteString, urlStr.contains(URLConstants.SourceURL) {
+            webView.load(URLRequest(url: URL(string: URLConstants.TransformedURL)!))
             return completionHandler(URLSession.AuthChallengeDisposition.useCredential, nil)
         }
         completionHandler(URLSession.AuthChallengeDisposition.useCredential, nil)
@@ -161,7 +158,7 @@ extension WebViewController {
     // 2 - Fetch file path
     func uploadFileToFileManager(path: String, type: String) -> String? {
         guard let filePath = Bundle.main.path(forResource: path, ofType: type) else {
-            print("Fail path fetching failed")
+            print("\nBundle ---> Fail path fetching failed")
             return nil
         }
         return filePath
@@ -171,10 +168,10 @@ extension WebViewController {
     func uploadToFileManager(fileManager: FileManager, source: String, destination: URL) {
         do {
             try fileManager.copyItem(at: URL(fileURLWithPath: source), to: destination)
-            print("File uploaded successfully")
+            print("\nFileManager ---> File uploaded successfully")
         }
         catch {
-            print("Failed to load the file")
+            print("\nFileManager ---> Failed to load the file")
         }
     }
     
