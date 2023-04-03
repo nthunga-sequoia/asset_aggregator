@@ -15,6 +15,7 @@ extension WebViewController : WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+        
         print("\nWebview decidePolicyFor ---> \(String(describing: navigationAction.request.url?.absoluteString))")
         
         if let urlStr = navigationAction.request.url?.absoluteString, urlStr.contains(URLConstants.SourceURL) {
@@ -23,6 +24,31 @@ extension WebViewController : WKNavigationDelegate {
         }
         return WKNavigationActionPolicy.allow
     }
+    
+//    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
+//                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+//        guard let url = navigationAction.request.url, url.scheme == "http" || url.scheme == "https" else {
+//            decisionHandler(.allow)
+//            return
+//        }
+//
+//        guard let resourcePath = url.host else {
+//            // Handle missing resource path
+//            decisionHandler(.cancel)
+//            return
+//        }
+//
+//        guard let url = Bundle.main.url(forResource: resourcePath, withExtension: nil) else {
+//            // Handle missing asset
+//            decisionHandler(.cancel)
+//            return
+//        }
+//        let finalURL = url.absoluteString + "/index.html"
+//        webView.loadFileURL(URL(string: finalURL)!, allowingReadAccessTo: url)
+//        decisionHandler(.cancel)
+//    }
+//
+//
     
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         print("\nURLAuthenticationChallenge ---> \(String(describing: webView.url?.absoluteString))")
@@ -130,5 +156,19 @@ extension WebViewController {
         }
     }
     
-
+//    
+//    func uploadImagesToFileManager(imageNamed: String, imageData: NSData) -> URL? {
+//        // save images to document folder
+//        let documentsDirectoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+//        let folderURL = documentsDirectoryURL.appendingPathComponent("images")
+//        let fileURL = folderURL.appendingPathComponent(imageNamed)
+//        do {
+//            try imageData.write(to: fileURL)
+//            printContent("\nFileManager ---> Downloaed Image writing successful")
+//            return fileURL
+//        } catch {
+//            print("Error writing image data to file: \(error.localizedDescription)")
+//            return nil
+//        }
+//    }
 }

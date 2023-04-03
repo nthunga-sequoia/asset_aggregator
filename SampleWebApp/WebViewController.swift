@@ -103,11 +103,11 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         }
         print("Asset filepath --->",folderName)
         
-        let url = Bundle.main.url(forResource: folderName,
+        let dataURL = Bundle.main.url(forResource: folderName,
                                   withExtension: "",
                                   subdirectory: "")
         
-        return url ?? nil
+        return dataURL ?? nil
     }
     
     private func fileUrlFromUrlFromDocument(_ url: URL) -> URL? {
@@ -131,8 +131,35 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         else {
             queryFileName = folderName.components(separatedBy: "localassets/").last ?? ""
         }
-        let url = fetchFileURLFromDocument(url, fileName: queryFileName) ?? nil
-        return url
+        let dataURL = fetchFileURLFromDocument(url, fileName: queryFileName) ?? nil
+        
+        if dataURL == nil {
+            let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let folderURL = documentDirectory.appendingPathComponent("images")
+            do {
+                try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print("Error creating folder: \(error)")
+            }
+            
+            // hard coded the image name for experiment
+            let imageName = "imageassets/img3.jpeg"
+            if let bundleURL = Bundle.main.url(forResource: imageName, withExtension: nil) {
+                let finalImageName = imageName.components(separatedBy: "imageassets/").last ?? ""
+                let destinationURL = folderURL.appendingPathComponent(finalImageName)
+                do {
+                    try FileManager.default.copyItem(at: bundleURL, to: destinationURL)
+                    print("\nFileManager ---> Image upload successful \(imageName)")
+                    return destinationURL
+                } catch {
+                    print("\nFileManager ---> Error copying \(imageName): \(error)")
+                }
+            } else {
+                print("\nFileManager ---> \(imageName) not found in bundle")
+            }
+        }
+        
+        return dataURL
     }
     
     private func mimeType(ofFileAtUrl url: URL) -> String? {
@@ -177,5 +204,21 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         
         return nil
     }
+    
+    func uploadImagesToFileManager(imageNamed: String, imageData: Data) -> URL? {
+        // save images to document folder
+        let documentsDirectoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let folderURL = documentsDirectoryURL.appendingPathComponent("images")
+        let fileURL = folderURL.appendingPathComponent(imageNamed)
+        do {
+            try imageData.write(to: fileURL)
+            print("\nFileManager ---> Downloaed Image writing successful")
+            return fileURL
+        } catch {
+            print("Error writing image data to file: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
 }
 
