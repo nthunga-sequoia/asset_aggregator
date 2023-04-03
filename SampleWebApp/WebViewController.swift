@@ -72,7 +72,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         
         guard let url = urlSchemeTask.request.url,
-              let fileUrl = fileUrlFromUrlFromDocument(url), // Switch the file source here
+              let fileUrl = fileUrlFromUrlFromBundle(url), // Switch the file source here
               let mimeType = mimeType(ofFileAtUrl: fileUrl),
               let data = try? Data(contentsOf: fileUrl) else { return }
 
