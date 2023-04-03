@@ -14,6 +14,7 @@
 		ECAF251E29C9AF720020F822 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ECAF251D29C9AF720020F822 /* Assets.xcassets */; };
 		ECAF252129C9AF720020F822 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ECAF251F29C9AF720020F822 /* LaunchScreen.storyboard */; };
 		ECAF252929C9B3990020F822 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF252829C9B3990020F822 /* WebViewController.swift */; };
+		ECEC0F5E29DAC24B00F5CECA /* WebViewController+Extenstion.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECEC0F5D29DAC24B00F5CECA /* WebViewController+Extenstion.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		ECAF252029C9AF720020F822 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ECAF252229C9AF720020F822 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ECAF252829C9B3990020F822 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
+		ECEC0F5D29DAC24B00F5CECA /* WebViewController+Extenstion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebViewController+Extenstion.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				ECAF251429C9AF6E0020F822 /* AppDelegate.swift */,
 				ECAF251629C9AF6E0020F822 /* SceneDelegate.swift */,
 				ECAF252829C9B3990020F822 /* WebViewController.swift */,
+				ECEC0F5D29DAC24B00F5CECA /* WebViewController+Extenstion.swift */,
 				ECAF251A29C9AF6E0020F822 /* Main.storyboard */,
 				ECAF251D29C9AF720020F822 /* Assets.xcassets */,
 				ECAF251F29C9AF720020F822 /* LaunchScreen.storyboard */,
@@ -144,6 +147,7 @@
 			files = (
 				ECAF251529C9AF6E0020F822 /* AppDelegate.swift in Sources */,
 				ECAF251729C9AF6E0020F822 /* SceneDelegate.swift in Sources */,
+				ECEC0F5E29DAC24B00F5CECA /* WebViewController+Extenstion.swift in Sources */,
 				ECAF252929C9B3990020F822 /* WebViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
