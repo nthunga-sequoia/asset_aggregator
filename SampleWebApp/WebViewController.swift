@@ -36,6 +36,13 @@ class WebViewController: UIViewController {
         super.viewDidLoad()
         setupWebview()
         loadWebPage()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshWebView), name: NSNotification.Name("RefreshWebView"), object: nil)
+    }
+    
+    // Reload the webivew, when some of the assets are missing
+    @objc func refreshWebView() {
+        webview.reload()
     }
     
     func loadWebPage() {
@@ -72,7 +79,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         
         guard let url = urlSchemeTask.request.url,
-              let fileUrl = fileUrlFromUrlFromDocument(url), // Switch the file source here
+              let fileUrl = fetchAssetURLFromDocument(url), // Switch the file source here
               let mimeType = mimeType(ofFileAtUrl: fileUrl),
               let data = try? Data(contentsOf: fileUrl) else { return }
 
@@ -88,9 +95,17 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         urlSchemeTask.didFinish()
     }
     
-    // MARK: - Private
+    private func mimeType(ofFileAtUrl url: URL) -> String? {
+        //print("\nMIME type for URL --->", url)
+        guard let type = UTType(filenameExtension: url.pathExtension) else {
+            return nil
+        }
+        return type.preferredMIMEType
+    }
+    
+    // MARK: - Fetching the assets from local Bundle
 
-    private func fileUrlFromUrlFromBundle(_ url: URL) -> URL? {
+    private func fetchAssetURLFromBundle(_ url: URL) -> URL? {
         print("\nFile URL from URL --->", url)
         var folderName = URLConstants.SchemaURL
         
@@ -103,14 +118,47 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         }
         print("Asset filepath --->",folderName)
         
-        let dataURL = Bundle.main.url(forResource: folderName,
+        var dataURL = Bundle.main.url(forResource: folderName,
                                   withExtension: "",
                                   subdirectory: "")
+        
+        if dataURL == nil {
+            dataURL = fetchMissingAssetsForBundle(url: url)
+        }
         
         return dataURL ?? nil
     }
     
-    private func fileUrlFromUrlFromDocument(_ url: URL) -> URL? {
+    private func fetchMissingAssetsForBundle(url: URL) -> URL? {
+        let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let folderURL = documentDirectory.appendingPathComponent("images")
+        do {
+            try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            print("Error creating folder: \(error)")
+        }
+        
+       // hard coded the image name for experiment
+       let imageName = "imageassets/img3.jpeg"
+       if let bundleURL = Bundle.main.url(forResource: imageName, withExtension: nil) {
+           let finalImageName = imageName.components(separatedBy: "imageassets/").last ?? ""
+           let destinationURL = folderURL.appendingPathComponent(finalImageName)
+           do {
+               try FileManager.default.copyItem(at: bundleURL, to: destinationURL)
+               print("\nFileManager ---> Image upload successful \(imageName)")
+               return destinationURL
+           } catch {
+               print("\nFileManager ---> Error copying \(imageName): \(error)")
+           }
+       } else {
+           print("\nFileManager ---> \(imageName) not found in bundle")
+       }
+        return nil
+    }
+    
+    // MARK: - Fetching the assets from local Document folder
+
+    private func fetchAssetURLFromDocument(_ url: URL) -> URL? {
         print("\nFile URL from URL --->", url)
         
         var folderName = URLConstants.SchemaURL
@@ -131,45 +179,38 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         else {
             queryFileName = folderName.components(separatedBy: "localassets/").last ?? ""
         }
-        let dataURL = fetchFileURLFromDocument(url, fileName: queryFileName) ?? nil
+        var dataURL = fetchFileURLFromDocument(url, fileName: queryFileName) ?? nil
         
         if dataURL == nil {
-            let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            let folderURL = documentDirectory.appendingPathComponent("images")
-            do {
-                try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                print("Error creating folder: \(error)")
-            }
-            
-            // hard coded the image name for experiment
-            let imageName = "imageassets/img3.jpeg"
-            if let bundleURL = Bundle.main.url(forResource: imageName, withExtension: nil) {
-                let finalImageName = imageName.components(separatedBy: "imageassets/").last ?? ""
-                let destinationURL = folderURL.appendingPathComponent(finalImageName)
-                do {
-                    try FileManager.default.copyItem(at: bundleURL, to: destinationURL)
-                    print("\nFileManager ---> Image upload successful \(imageName)")
-                    return destinationURL
-                } catch {
-                    print("\nFileManager ---> Error copying \(imageName): \(error)")
-                }
-            } else {
-                print("\nFileManager ---> \(imageName) not found in bundle")
-            }
+            dataURL = self.fetchMissingAssetsForDocument(url: url)
         }
-        
         return dataURL
     }
     
-    private func mimeType(ofFileAtUrl url: URL) -> String? {
-        //print("\nMIME type for URL --->", url)
-        guard let type = UTType(filenameExtension: url.pathExtension) else {
+    private func fetchMissingAssetsForDocument(url: URL) -> URL? {
+        let imageNamed = url.lastPathComponent
+        var dataURL = URL(string: "")
+        guard let imageUrl = URL(string: "https://cdn.pixabay.com/photo/2015/03/10/17/23/youtube-667451_1280.png") else {
             return nil
         }
-        return type.preferredMIMEType
+        
+        let task = URLSession.shared.dataTask(with: imageUrl) { data, response, error in
+            guard let data = data, error == nil else {
+                print("Data not found")
+                return
+            }
+            dataURL = self.uploadImagesToFileManager(imageNamed: imageNamed, imageData: data)
+            
+            if dataURL != nil {
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: NSNotification.Name("RefreshWebView"), object: nil)
+                }
+            }
+        }
+        task.resume()
+        return dataURL
     }
-    
+
     private func fetchFileURLFromDocument(_ url: URL, fileName: String) -> URL? {
         let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         
@@ -219,6 +260,5 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
             return nil
         }
     }
-
 }
 
