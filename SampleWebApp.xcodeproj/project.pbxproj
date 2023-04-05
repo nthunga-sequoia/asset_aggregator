@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		EC9AE23D29D4A2AF007A103B /* localassets in Resources */ = {isa = PBXBuildFile; fileRef = EC9AE23C29D4A2AF007A103B /* localassets */; };
+		ECA96D1A29DD97650064E36A /* webassets.zip in Resources */ = {isa = PBXBuildFile; fileRef = ECA96D1929DD97650064E36A /* webassets.zip */; };
+		ECA96D1F29DDAA230064E36A /* tempfolder in Resources */ = {isa = PBXBuildFile; fileRef = ECA96D1E29DDAA230064E36A /* tempfolder */; };
 		ECAF251529C9AF6E0020F822 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF251429C9AF6E0020F822 /* AppDelegate.swift */; };
 		ECAF251729C9AF6E0020F822 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF251629C9AF6E0020F822 /* SceneDelegate.swift */; };
 		ECAF251C29C9AF6E0020F822 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ECAF251A29C9AF6E0020F822 /* Main.storyboard */; };
@@ -16,10 +18,13 @@
 		ECAF252929C9B3990020F822 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF252829C9B3990020F822 /* WebViewController.swift */; };
 		ECEC0F5E29DAC24B00F5CECA /* WebViewController+Extenstion.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECEC0F5D29DAC24B00F5CECA /* WebViewController+Extenstion.swift */; };
 		ECFC6F7A29DB064E001934B2 /* imageassets in Resources */ = {isa = PBXBuildFile; fileRef = ECFC6F7929DB064E001934B2 /* imageassets */; };
+		ECFC6F8129DC302B001934B2 /* ZipArchive in Frameworks */ = {isa = PBXBuildFile; productRef = ECFC6F8029DC302B001934B2 /* ZipArchive */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		EC9AE23C29D4A2AF007A103B /* localassets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = localassets; sourceTree = "<group>"; };
+		ECA96D1929DD97650064E36A /* webassets.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = webassets.zip; sourceTree = "<group>"; };
+		ECA96D1E29DDAA230064E36A /* tempfolder */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tempfolder; sourceTree = "<group>"; };
 		ECAF251129C9AF6E0020F822 /* SampleWebApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleWebApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECAF251429C9AF6E0020F822 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ECAF251629C9AF6E0020F822 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -37,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECFC6F8129DC302B001934B2 /* ZipArchive in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +68,8 @@
 		ECAF251329C9AF6E0020F822 /* SampleWebApp */ = {
 			isa = PBXGroup;
 			children = (
+				ECA96D1E29DDAA230064E36A /* tempfolder */,
+				ECA96D1929DD97650064E36A /* webassets.zip */,
 				ECFC6F7929DB064E001934B2 /* imageassets */,
 				EC9AE23C29D4A2AF007A103B /* localassets */,
 				ECAF251429C9AF6E0020F822 /* AppDelegate.swift */,
@@ -92,6 +100,9 @@
 			dependencies = (
 			);
 			name = SampleWebApp;
+			packageProductDependencies = (
+				ECFC6F8029DC302B001934B2 /* ZipArchive */,
+			);
 			productName = SampleWebApp;
 			productReference = ECAF251129C9AF6E0020F822 /* SampleWebApp.app */;
 			productType = "com.apple.product-type.application";
@@ -120,6 +131,9 @@
 				Base,
 			);
 			mainGroup = ECAF250829C9AF6E0020F822;
+			packageReferences = (
+				ECFC6F7F29DC302B001934B2 /* XCRemoteSwiftPackageReference "ZipArchive" */,
+			);
 			productRefGroup = ECAF251229C9AF6E0020F822 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -137,6 +151,8 @@
 				EC9AE23D29D4A2AF007A103B /* localassets in Resources */,
 				ECAF252129C9AF720020F822 /* LaunchScreen.storyboard in Resources */,
 				ECAF251E29C9AF720020F822 /* Assets.xcassets in Resources */,
+				ECA96D1F29DDAA230064E36A /* tempfolder in Resources */,
+				ECA96D1A29DD97650064E36A /* webassets.zip in Resources */,
 				ECFC6F7A29DB064E001934B2 /* imageassets in Resources */,
 				ECAF251C29C9AF6E0020F822 /* Main.storyboard in Resources */,
 			);
@@ -372,6 +388,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		ECFC6F7F29DC302B001934B2 /* XCRemoteSwiftPackageReference "ZipArchive" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ZipArchive/ZipArchive.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		ECFC6F8029DC302B001934B2 /* ZipArchive */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ECFC6F7F29DC302B001934B2 /* XCRemoteSwiftPackageReference "ZipArchive" */;
+			productName = ZipArchive;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = ECAF250929C9AF6E0020F822 /* Project object */;
 }

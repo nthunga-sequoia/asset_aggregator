@@ -8,6 +8,7 @@
 import UIKit
 import WebKit
 import UniformTypeIdentifiers
+import ZipArchive
 
 // schema URL should be alway in lowercase
 struct URLConstants {
@@ -30,19 +31,57 @@ class WebViewController: UIViewController {
         super.loadView()
         moveAssetFilesFromBundleToFileManager()
         getDocumentURL()
+        unzipFile()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupWebview()
         loadWebPage()
-        
+
         NotificationCenter.default.addObserver(self, selector: #selector(refreshWebView), name: NSNotification.Name("RefreshWebView"), object: nil)
     }
-    
+        
     // Reload the webivew, when some of the assets are missing
     @objc func refreshWebView() {
         webview.reload()
+    }
+    
+    func unzipFile() {
+        guard let filePath = Bundle.main.path(forResource: "webassets", ofType: "zip") else {
+            print("\nBundle ---> Failed fetch zipped file")
+            return
+        }
+        
+        guard let imageAssetPath = Bundle.main.path(forResource: "tempfolder", ofType: "") else {
+            print("\nBundle ---> Failed fetch zipped file")
+            return
+        }
+
+        let fileManager = FileManager.default
+        guard let documentUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return
+        }
+        let result = SSZipArchive.unzipFile(atPath: filePath, toDestination: imageAssetPath)
+        if result == true {
+            print("File unzipped successfully.")
+
+            do {
+                if #available(iOS 16.0, *) {
+                    let folderURL = documentUrl.appendingPathComponent("unzipped")
+                    try fileManager.copyItem(at: URL(filePath: imageAssetPath), to: folderURL)
+                } else {
+                    // Fallback on earlier versions
+                }
+                print("\nFileManager ---> File uploaded successfully")
+            }
+            catch {
+                print("\nFileManager ---> Failed to load the file")
+            }
+        }
+        else {
+            print("Failed to unzip file.")
+        }
     }
     
     func loadWebPage() {
@@ -95,6 +134,8 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         urlSchemeTask.didFinish()
     }
     
+    // MARK: - Get asset MIME Type
+
     private func mimeType(ofFileAtUrl url: URL) -> String? {
         //print("\nMIME type for URL --->", url)
         guard let type = UTType(filenameExtension: url.pathExtension) else {
