@@ -119,7 +119,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         
         guard let url = urlSchemeTask.request.url,
               let fileUrl = fetchAssetURLFromDocument(url), // Switch the file source here
-              let mimeType = mimeType(ofFileAtUrl: fileUrl),
+              let mimeType = Helper.mimeType(ofFileAtUrl: fileUrl),
               let data = try? Data(contentsOf: fileUrl) else { return }
 
         let response = HTTPURLResponse(url: url,
@@ -133,17 +133,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         urlSchemeTask.didReceive(data)
         urlSchemeTask.didFinish()
     }
-    
-    // MARK: - Get asset MIME Type
 
-    private func mimeType(ofFileAtUrl url: URL) -> String? {
-        //print("\nMIME type for URL --->", url)
-        guard let type = UTType(filenameExtension: url.pathExtension) else {
-            return nil
-        }
-        return type.preferredMIMEType
-    }
-    
     // MARK: - Fetching the assets from local Bundle
 
     private func fetchAssetURLFromBundle(_ url: URL) -> URL? {
@@ -260,7 +250,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
             for fileUrl in files {
                 // Do something with the HTML file, such as loading it into a WebView
                 
-                if let mimeType = mimeType(ofFileAtUrl: url), mimeType == "image/jpeg" {
+                if let mimeType = Helper.mimeType(ofFileAtUrl: url), mimeType == "image/jpeg" {
                     if fileUrl.lastPathComponent != "images" {
                         continue
                     }

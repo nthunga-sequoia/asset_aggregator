@@ -25,6 +25,7 @@ extension WebViewController : WKNavigationDelegate {
         return WKNavigationActionPolicy.allow
     }
     
+//    // Loading directly from file URL
 //    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
 //                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 //        guard let url = navigationAction.request.url, url.scheme == "http" || url.scheme == "https" else {
@@ -32,23 +33,51 @@ extension WebViewController : WKNavigationDelegate {
 //            return
 //        }
 //
+//        //MARK: Loading file from bundle
+//        /*
 //        guard let resourcePath = url.host else {
 //            // Handle missing resource path
 //            decisionHandler(.cancel)
 //            return
 //        }
-//
 //        guard let url = Bundle.main.url(forResource: resourcePath, withExtension: nil) else {
 //            // Handle missing asset
 //            decisionHandler(.cancel)
 //            return
 //        }
-//        let finalURL = url.absoluteString + "/index.html"
+//
+//        let finalURL = url.absoluteString + "index.html"
 //        webView.loadFileURL(URL(string: finalURL)!, allowingReadAccessTo: url)
 //        decisionHandler(.cancel)
+//         */
+//
+//        //MARK: Loading file from document folder
+//        let fileManager = FileManager.default
+//        guard let documentUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+//            return
+//        }
+//        let finalURL = documentUrl.absoluteString + "/index.html"
+//        webView.loadFileURL(URL(string: finalURL)!, allowingReadAccessTo: documentUrl)
+//        decisionHandler(.cancel)
 //    }
+
+//    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 //
-//
+//        if let url = navigationAction.request.url, !url.isFileURL {
+//            if let resourceURL = Bundle.main.url(forResource: url.lastPathComponent, withExtension: nil) {
+//                do {
+//                    let resourceData = try Data(contentsOf: resourceURL)
+//                    let mimeType = Helper.mimeType(ofFileAtUrl: url)
+//                    webView.load(resourceData, mimeType: mimeType!, characterEncodingName: "UTF-8", baseURL: url.deletingLastPathComponent())
+//                    decisionHandler(.cancel)
+//                    return
+//                } catch {
+//                    print("Error loading file: \(error.localizedDescription)")
+//                }
+//            }
+//        }
+//        decisionHandler(.allow)
+//    }
     
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         print("\nURLAuthenticationChallenge ---> \(String(describing: webView.url?.absoluteString))")
@@ -115,7 +144,7 @@ extension WebViewController {
         }
         let destinationURL = documentDirectory.appendingPathComponent("style.css")
         uploadToFileManager(fileManager: fileManager, source: filePath, destination: destinationURL)
-
+        
         //upload page.js file to Document folder
         filePathStr = URLConstants.SchemaURL + "/page"
         guard let filePath = uploadFileToFileManager(path: filePathStr, type: "js") else {
@@ -155,20 +184,5 @@ extension WebViewController {
             }
         }
     }
-    
-//    
-//    func uploadImagesToFileManager(imageNamed: String, imageData: NSData) -> URL? {
-//        // save images to document folder
-//        let documentsDirectoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-//        let folderURL = documentsDirectoryURL.appendingPathComponent("images")
-//        let fileURL = folderURL.appendingPathComponent(imageNamed)
-//        do {
-//            try imageData.write(to: fileURL)
-//            printContent("\nFileManager ---> Downloaed Image writing successful")
-//            return fileURL
-//        } catch {
-//            print("Error writing image data to file: \(error.localizedDescription)")
-//            return nil
-//        }
-//    }
 }
+    
