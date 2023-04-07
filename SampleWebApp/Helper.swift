@@ -40,7 +40,7 @@ class Helper {
             print("File unzipped successfully.")
 
             do {
-                let folderURL = documentUrl.appendingPathComponent("unzipped")
+                let folderURL = documentUrl.appendingPathComponent(URLConstants.UnzippedFile)
                 if #available(iOS 16.0, *) {
                     try fileManager.copyItem(at: URL(filePath: tempPath), to: folderURL)
                 } else {

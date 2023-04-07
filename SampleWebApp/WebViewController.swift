@@ -15,6 +15,7 @@ struct URLConstants {
     static let SourceURL = "http://nthunga.infinityfreeapp.com"
     static let TransformedURL = "localassets://nthunga.infinityfreeapp.com"
     static let SchemaURL = "localassets"
+    static let UnzippedFile = "unzipped"
     
 //    static let LoadingURL = "https://px.sequoia.com/"
 //    static let SourceURL = "https://px.sequoia.com/"
@@ -28,9 +29,7 @@ class WebViewController: UIViewController {
     
     override func loadView() {
         super.loadView()
-//        moveAssetFilesFromBundleToFileManager()
-//        getDocumentURL()
-        let destinationPath = Helper.unzipFile("localassets")
+        let destinationPath = Helper.unzipFile(URLConstants.SchemaURL)
         print("\n\nUnzipped file path -->",destinationPath ?? "")
     }
     
@@ -106,7 +105,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     private func fetchAssetURLFromDocument(_ url: URL) -> URL? {
         print("\nFile URL from URL --->", url)
         
-        var folderName = "unzipped/" + URLConstants.SchemaURL
+        var folderName = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL
         
         // At first we need to pass HTML page, then each assets in the HTML file will be called for respective assets.
         if url.absoluteString == URLConstants.TransformedURL {
@@ -119,10 +118,12 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         
         var queryFileName = ""
         if folderName.contains("/images") {
-            queryFileName = folderName.components(separatedBy: "unzipped/localassets/images/").last ?? ""
+            let queryString = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL + "/images/"
+            queryFileName = folderName.components(separatedBy: queryString).last ?? ""
         }
         else {
-            queryFileName = folderName.components(separatedBy: "unzipped/localassets/").last ?? ""
+            let queryString = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL + "/"
+            queryFileName = folderName.components(separatedBy: queryString).last ?? ""
         }
         var dataURL = fetchFileURLFromDocument(url, fileName: queryFileName) ?? nil
         
@@ -135,7 +136,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     private func fetchFileURLFromDocument(_ url: URL, fileName: String) -> URL? {
         let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         
-        let pathURLString = "unzipped/" + URLConstants.SchemaURL
+        let pathURLString = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL
         let unzippedURLs = documentDirectory.appendingPathComponent(pathURLString)
         let documentFiles = try? FileManager.default.contentsOfDirectory(at: unzippedURLs, includingPropertiesForKeys: nil)
 
@@ -147,7 +148,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
                     if fileUrl.lastPathComponent != "images" {
                         continue
                     }
-                    let imageFolderURL = "unzipped/" + URLConstants.SchemaURL + "/images"
+                    let imageFolderURL = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL + "/images"
                     let folderURL = documentDirectory.appendingPathComponent(imageFolderURL)
                     do {
                         let fileURLs = try FileManager.default.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil)
@@ -198,7 +199,8 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     func uploadImagesToFileManager(imageNamed: String, imageData: Data) -> URL? {
         // save images to document folder
         let documentsDirectoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let folderURL = documentsDirectoryURL.appendingPathComponent("unzipped/localassets/images")
+        let queryString = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL + "/images"
+        let folderURL = documentsDirectoryURL.appendingPathComponent(queryString)
         let fileURL = folderURL.appendingPathComponent(imageNamed)
         do {
             try imageData.write(to: fileURL)
