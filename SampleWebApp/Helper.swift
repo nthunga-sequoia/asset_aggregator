@@ -11,7 +11,6 @@ import ZipArchive
 
 class Helper {
     
-    
     class func mimeType(ofFileAtUrl url: URL) -> String? {
         //print("\nMIME type for URL --->", url)
         guard let type = UTType(filenameExtension: url.pathExtension) else {

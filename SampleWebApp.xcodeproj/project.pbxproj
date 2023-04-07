@@ -11,13 +11,13 @@
 		ECA96D1F29DDAA230064E36A /* tempfolder in Resources */ = {isa = PBXBuildFile; fileRef = ECA96D1E29DDAA230064E36A /* tempfolder */; };
 		ECA96D2329DE9F6E0064E36A /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA96D2229DE9F6E0064E36A /* Helper.swift */; };
 		ECA96D2529DFEA860064E36A /* localassets.zip in Resources */ = {isa = PBXBuildFile; fileRef = ECA96D2429DFEA860064E36A /* localassets.zip */; };
+		ECA96D2729DFFF5C0064E36A /* DocumentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA96D2629DFFF5C0064E36A /* DocumentManager.swift */; };
 		ECAF251529C9AF6E0020F822 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF251429C9AF6E0020F822 /* AppDelegate.swift */; };
 		ECAF251729C9AF6E0020F822 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF251629C9AF6E0020F822 /* SceneDelegate.swift */; };
 		ECAF251C29C9AF6E0020F822 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ECAF251A29C9AF6E0020F822 /* Main.storyboard */; };
 		ECAF251E29C9AF720020F822 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ECAF251D29C9AF720020F822 /* Assets.xcassets */; };
 		ECAF252129C9AF720020F822 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ECAF251F29C9AF720020F822 /* LaunchScreen.storyboard */; };
 		ECAF252929C9B3990020F822 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAF252829C9B3990020F822 /* WebViewController.swift */; };
-		ECEC0F5E29DAC24B00F5CECA /* WebViewController+Extenstion.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECEC0F5D29DAC24B00F5CECA /* WebViewController+Extenstion.swift */; };
 		ECFC6F7A29DB064E001934B2 /* imageassets in Resources */ = {isa = PBXBuildFile; fileRef = ECFC6F7929DB064E001934B2 /* imageassets */; };
 		ECFC6F8129DC302B001934B2 /* ZipArchive in Frameworks */ = {isa = PBXBuildFile; productRef = ECFC6F8029DC302B001934B2 /* ZipArchive */; };
 /* End PBXBuildFile section */
@@ -27,6 +27,7 @@
 		ECA96D1E29DDAA230064E36A /* tempfolder */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tempfolder; sourceTree = "<group>"; };
 		ECA96D2229DE9F6E0064E36A /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		ECA96D2429DFEA860064E36A /* localassets.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = localassets.zip; sourceTree = "<group>"; };
+		ECA96D2629DFFF5C0064E36A /* DocumentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentManager.swift; sourceTree = "<group>"; };
 		ECAF251129C9AF6E0020F822 /* SampleWebApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleWebApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECAF251429C9AF6E0020F822 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ECAF251629C9AF6E0020F822 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -35,7 +36,6 @@
 		ECAF252029C9AF720020F822 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ECAF252229C9AF720020F822 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ECAF252829C9B3990020F822 /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
-		ECEC0F5D29DAC24B00F5CECA /* WebViewController+Extenstion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebViewController+Extenstion.swift"; sourceTree = "<group>"; };
 		ECFC6F7929DB064E001934B2 /* imageassets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = imageassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -77,12 +77,12 @@
 				ECAF251429C9AF6E0020F822 /* AppDelegate.swift */,
 				ECAF251629C9AF6E0020F822 /* SceneDelegate.swift */,
 				ECAF252829C9B3990020F822 /* WebViewController.swift */,
-				ECEC0F5D29DAC24B00F5CECA /* WebViewController+Extenstion.swift */,
 				ECA96D2229DE9F6E0064E36A /* Helper.swift */,
 				ECAF251A29C9AF6E0020F822 /* Main.storyboard */,
 				ECAF251D29C9AF720020F822 /* Assets.xcassets */,
 				ECAF251F29C9AF720020F822 /* LaunchScreen.storyboard */,
 				ECAF252229C9AF720020F822 /* Info.plist */,
+				ECA96D2629DFFF5C0064E36A /* DocumentManager.swift */,
 			);
 			path = SampleWebApp;
 			sourceTree = "<group>";
@@ -171,7 +171,7 @@
 				ECAF251529C9AF6E0020F822 /* AppDelegate.swift in Sources */,
 				ECAF251729C9AF6E0020F822 /* SceneDelegate.swift in Sources */,
 				ECA96D2329DE9F6E0064E36A /* Helper.swift in Sources */,
-				ECEC0F5E29DAC24B00F5CECA /* WebViewController+Extenstion.swift in Sources */,
+				ECA96D2729DFFF5C0064E36A /* DocumentManager.swift in Sources */,
 				ECAF252929C9B3990020F822 /* WebViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

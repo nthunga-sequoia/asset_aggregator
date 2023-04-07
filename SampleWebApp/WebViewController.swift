@@ -8,7 +8,6 @@
 import UIKit
 import WebKit
 
-
 // schema URL should be alway in lowercase
 struct URLConstants {
     static let LoadingURL = "http://nthunga.infinityfreeapp.com"
@@ -22,6 +21,8 @@ struct URLConstants {
 //    static let TransformedURL = "assets://px.sequoia.com/rtw"
 //    static let SchemaURL = "assets"
 }
+
+let documentManger = DocumentManager()
 
 class WebViewController: UIViewController {
     
@@ -46,12 +47,14 @@ class WebViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
+    //MARK: — Private methods
+
     // Reload the webivew, when some of the assets are missing
     @objc func refreshWebView() {
         webview.reload()
     }
     
-    func loadWebPage() {
+    private func loadWebPage() {
         if let requestURL = URL(string: URLConstants.LoadingURL) {
             let URLRequest = NSMutableURLRequest(url: requestURL)
             URLRequest.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
@@ -59,7 +62,7 @@ class WebViewController: UIViewController {
         }
     }
     
-    func setupWebview() {
+    private func setupWebview() {
         let preferences = WKPreferences()
         let config = WKWebViewConfiguration()
         config.preferences = preferences
@@ -85,7 +88,7 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         
         guard let url = urlSchemeTask.request.url,
-              let fileUrl = fetchAssetURLFromDocument(url), // Switch the file source here
+              let fileUrl = documentManger.fetchAssetURLFromDocument(url), // Switch the file source here
               let mimeType = Helper.mimeType(ofFileAtUrl: fileUrl),
               let data = try? Data(contentsOf: fileUrl) else { return }
 
@@ -100,170 +103,92 @@ class ConfigHandler: NSObject, WKURLSchemeHandler {
         urlSchemeTask.didReceive(data)
         urlSchemeTask.didFinish()
     }
-
-    // MARK: - Fetching the assets from local Document folder
-    private func fetchAssetURLFromDocument(_ url: URL) -> URL? {
-        print("\nFile URL from URL --->", url)
-        
-        var folderName = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL
-        
-        // At first we need to pass HTML page, then each assets in the HTML file will be called for respective assets.
-        if url.absoluteString == URLConstants.TransformedURL {
-            folderName += "/" + "index.html"
-        }
-        else {
-            folderName += "/" + (url.absoluteString.components(separatedBy: ".com/").last ?? "")
-        }
-        print("\nAsset filepath --->",folderName)
-        
-        var queryFileName = ""
-        if folderName.contains("/images") {
-            let queryString = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL + "/images/"
-            queryFileName = folderName.components(separatedBy: queryString).last ?? ""
-        }
-        else {
-            let queryString = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL + "/"
-            queryFileName = folderName.components(separatedBy: queryString).last ?? ""
-        }
-        var dataURL = fetchFileURLFromDocument(url, fileName: queryFileName) ?? nil
-        
-        if dataURL == nil {
-            dataURL = self.fetchMissingAssetsForDocument(url: url)
-        }
-        return dataURL
-    }
-    
-    private func fetchFileURLFromDocument(_ url: URL, fileName: String) -> URL? {
-        let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        
-        let pathURLString = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL
-        let unzippedURLs = documentDirectory.appendingPathComponent(pathURLString)
-        let documentFiles = try? FileManager.default.contentsOfDirectory(at: unzippedURLs, includingPropertiesForKeys: nil)
-
-        if let files = documentFiles {
-            for fileUrl in files {
-                // Do something with the HTML file, such as loading it into a WebView
-                
-                if let mimeType = Helper.mimeType(ofFileAtUrl: url), mimeType == "image/jpeg" {
-                    if fileUrl.lastPathComponent != "images" {
-                        continue
-                    }
-                    let imageFolderURL = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL + "/images"
-                    let folderURL = documentDirectory.appendingPathComponent(imageFolderURL)
-                    do {
-                        let fileURLs = try FileManager.default.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil)
-                        let url = fileURLs.filter{$0.lastPathComponent == fileName}.first
-                        return url
-                    } catch {
-                        print("Error fetching files: \(error)")
-                    }
-                }
-                else {
-                    // check the filename & return the right
-                    if fileName == fileUrl.lastPathComponent {
-                        return fileUrl
-                    }
-                }
-            }
-        } else {
-            print("\nFileManager ---> No Files found")
-        }
-        
-        return nil
-    }
-    
-    private func fetchMissingAssetsForDocument(url: URL) -> URL? {
-        let imageNamed = url.lastPathComponent
-        var dataURL = URL(string: "")
-        guard let imageUrl = URL(string: "https://cdn.pixabay.com/photo/2015/03/10/17/23/youtube-667451_1280.png") else {
-            return nil
-        }
-        
-        let task = URLSession.shared.dataTask(with: imageUrl) { data, response, error in
-            guard let data = data, error == nil else {
-                print("Data not found")
-                return
-            }
-            dataURL = self.uploadImagesToFileManager(imageNamed: imageNamed, imageData: data)
-            
-            if dataURL != nil {
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: NSNotification.Name("RefreshWebView"), object: nil)
-                }
-            }
-        }
-        task.resume()
-        return dataURL
-    }
-    
-    func uploadImagesToFileManager(imageNamed: String, imageData: Data) -> URL? {
-        // save images to document folder
-        let documentsDirectoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let queryString = URLConstants.UnzippedFile + "/" + URLConstants.SchemaURL + "/images"
-        let folderURL = documentsDirectoryURL.appendingPathComponent(queryString)
-        let fileURL = folderURL.appendingPathComponent(imageNamed)
-        do {
-            try imageData.write(to: fileURL)
-            print("\nFileManager ---> Downloaed Image writing successful")
-            return fileURL
-        } catch {
-            print("Error writing image data to file: \(error.localizedDescription)")
-            return nil
-        }
-    }
-    
-    // MARK: - Fetching the assets from local Bundle
-
-    private func fetchAssetURLFromBundle(_ url: URL) -> URL? {
-        print("\nFile URL from URL --->", url)
-        var folderName = URLConstants.SchemaURL
-        
-        // At first we need to pass HTML page, then each assets in the HTML file will be called for respective assets.
-        if url.absoluteString == URLConstants.TransformedURL {
-            folderName += "/" + "index.html"
-        }
-        else {
-            folderName += "/" + (url.absoluteString.components(separatedBy: ".com/").last ?? "")
-        }
-        print("Asset filepath --->",folderName)
-        
-        var dataURL = Bundle.main.url(forResource: folderName,
-                                  withExtension: "",
-                                  subdirectory: "")
-        
-        if dataURL == nil {
-            dataURL = fetchMissingAssetsForBundle(url: url)
-        }
-        
-        return dataURL ?? nil
-    }
-    
-    private func fetchMissingAssetsForBundle(url: URL) -> URL? {
-        let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let folderURL = documentDirectory.appendingPathComponent("images")
-        do {
-            try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
-        } catch {
-            print("Error creating folder: \(error)")
-        }
-        
-       // hard coded the image name for experiment
-       let imageName = "imageassets/img3.jpeg"
-       if let bundleURL = Bundle.main.url(forResource: imageName, withExtension: nil) {
-           let finalImageName = imageName.components(separatedBy: "imageassets/").last ?? ""
-           let destinationURL = folderURL.appendingPathComponent(finalImageName)
-           do {
-               try FileManager.default.copyItem(at: bundleURL, to: destinationURL)
-               print("\nFileManager ---> Image upload successful \(imageName)")
-               return destinationURL
-           } catch {
-               print("\nFileManager ---> Error copying \(imageName): \(error)")
-           }
-       } else {
-           print("\nFileManager ---> \(imageName) not found in bundle")
-       }
-        return nil
-    }
-    
 }
 
+//MARK: — WK Navigation Delegates methods
+
+extension WebViewController : WKNavigationDelegate {
+    
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        print("\nWebview ---> didStartProvisionalNavigation")
+    }
+    
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
+        
+        print("\nWebview decidePolicyFor ---> \(String(describing: navigationAction.request.url?.absoluteString))")
+        
+        if let urlStr = navigationAction.request.url?.absoluteString, urlStr.contains(URLConstants.SourceURL) {
+            webView.load(URLRequest(url: URL(string: URLConstants.TransformedURL)!))
+            return WKNavigationActionPolicy.cancel
+        }
+        return WKNavigationActionPolicy.allow
+    }
+    
+//    // Loading directly from file URL
+//    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
+//                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+//        guard let url = navigationAction.request.url, url.scheme == "http" || url.scheme == "https" else {
+//            decisionHandler(.allow)
+//            return
+//        }
+//
+//        //MARK: Loading file from bundle
+//        /*
+//        guard let resourcePath = url.host else {
+//            // Handle missing resource path
+//            decisionHandler(.cancel)
+//            return
+//        }
+//        guard let url = Bundle.main.url(forResource: resourcePath, withExtension: nil) else {
+//            // Handle missing asset
+//            decisionHandler(.cancel)
+//            return
+//        }
+//
+//        let finalURL = url.absoluteString + "index.html"
+//        webView.loadFileURL(URL(string: finalURL)!, allowingReadAccessTo: url)
+//        decisionHandler(.cancel)
+//         */
+//
+//        //MARK: Loading file from document folder
+//        let fileManager = FileManager.default
+//        guard let documentUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+//            return
+//        }
+//        let finalURL = documentUrl.absoluteString + "/index.html"
+//        webView.loadFileURL(URL(string: finalURL)!, allowingReadAccessTo: documentUrl)
+//        decisionHandler(.cancel)
+//    }
+
+//    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+//
+//        if let url = navigationAction.request.url, !url.isFileURL {
+//            if let resourceURL = Bundle.main.url(forResource: url.lastPathComponent, withExtension: nil) {
+//                do {
+//                    let resourceData = try Data(contentsOf: resourceURL)
+//                    let mimeType = Helper.mimeType(ofFileAtUrl: url)
+//                    webView.load(resourceData, mimeType: mimeType!, characterEncodingName: "UTF-8", baseURL: url.deletingLastPathComponent())
+//                    decisionHandler(.cancel)
+//                    return
+//                } catch {
+//                    print("Error loading file: \(error.localizedDescription)")
+//                }
+//            }
+//        }
+//        decisionHandler(.allow)
+//    }
+    
+    func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        print("\nURLAuthenticationChallenge ---> \(String(describing: webView.url?.absoluteString))")
+        
+        if let urlStr = webView.url?.absoluteString, urlStr.contains(URLConstants.SourceURL) {
+            webView.load(URLRequest(url: URL(string: URLConstants.TransformedURL)!))
+            return completionHandler(URLSession.AuthChallengeDisposition.useCredential, nil)
+        }
+        completionHandler(URLSession.AuthChallengeDisposition.useCredential, nil)
+    }
+    
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        print(error)
+    }
+}
