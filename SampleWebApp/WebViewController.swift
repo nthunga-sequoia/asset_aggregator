@@ -11,7 +11,7 @@ import WebKit
 
 // schema URL should be alway in lowercase
 struct URLConstants {
-    static let LoadingURL = "http://nthunga.infinityfreeapp.com"
+    static let LoadingURL = "http://nthunga.infinityfreeapp.com/"
     static let SourceURL = "http://nthunga.infinityfreeapp.com"
     static let TransformedURL = "localassets://nthunga.infinityfreeapp.com"
     static let SchemaURL = "localassets"
@@ -29,8 +29,9 @@ class WebViewController: UIViewController {
     
     override func loadView() {
         super.loadView()
-        let destinationPath = Helper.unzipFile(URLConstants.SchemaURL)
-        print("\n\nUnzipped file path -->",destinationPath ?? "")
+//        let destinationPath = Helper.unzipFile(URLConstants.SchemaURL)
+        moveAssetFilesFromBundleToFileManager()
+//        print("\n\nUnzipped file path -->",destinationPath ?? "")
     }
     
     override func viewDidLoad() {
@@ -63,11 +64,14 @@ class WebViewController: UIViewController {
         let preferences = WKPreferences()
         let config = WKWebViewConfiguration()
         config.preferences = preferences
+        config.suppressesIncrementalRendering = true
         config.setURLSchemeHandler(ConfigHandler(), forURLScheme: URLConstants.SchemaURL)
 //        config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
 //        config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
+        
         webview = WKWebView(frame: .zero, configuration: config)
         webview.navigationDelegate = self
+        
         webview.allowsBackForwardNavigationGestures = true
         webview.frame = self.view.frame
         self.view.addSubview(webview)

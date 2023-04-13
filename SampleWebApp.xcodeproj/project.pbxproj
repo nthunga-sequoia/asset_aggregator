@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EC9AE23D29D4A2AF007A103B /* nthunga.infinityfreeapp.com in Resources */ = {isa = PBXBuildFile; fileRef = EC9AE23C29D4A2AF007A103B /* nthunga.infinityfreeapp.com */; };
+		EC9AE23D29D4A2AF007A103B /* localassets in Resources */ = {isa = PBXBuildFile; fileRef = EC9AE23C29D4A2AF007A103B /* localassets */; };
 		ECA96D1F29DDAA230064E36A /* tempfolder in Resources */ = {isa = PBXBuildFile; fileRef = ECA96D1E29DDAA230064E36A /* tempfolder */; };
 		ECA96D2329DE9F6E0064E36A /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA96D2229DE9F6E0064E36A /* Helper.swift */; };
 		ECA96D2529DFEA860064E36A /* localassets.zip in Resources */ = {isa = PBXBuildFile; fileRef = ECA96D2429DFEA860064E36A /* localassets.zip */; };
@@ -23,7 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		EC9AE23C29D4A2AF007A103B /* nthunga.infinityfreeapp.com */ = {isa = PBXFileReference; lastKnownFileType = folder; path = nthunga.infinityfreeapp.com; sourceTree = "<group>"; };
+		EC9AE23C29D4A2AF007A103B /* localassets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = localassets; sourceTree = "<group>"; };
 		ECA96D1E29DDAA230064E36A /* tempfolder */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tempfolder; sourceTree = "<group>"; };
 		ECA96D2229DE9F6E0064E36A /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		ECA96D2429DFEA860064E36A /* localassets.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = localassets.zip; sourceTree = "<group>"; };
@@ -73,7 +73,7 @@
 				ECA96D2429DFEA860064E36A /* localassets.zip */,
 				ECA96D1E29DDAA230064E36A /* tempfolder */,
 				ECFC6F7929DB064E001934B2 /* imageassets */,
-				EC9AE23C29D4A2AF007A103B /* nthunga.infinityfreeapp.com */,
+				EC9AE23C29D4A2AF007A103B /* localassets */,
 				ECAF251429C9AF6E0020F822 /* AppDelegate.swift */,
 				ECAF251629C9AF6E0020F822 /* SceneDelegate.swift */,
 				ECAF252829C9B3990020F822 /* WebViewController.swift */,
@@ -151,7 +151,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EC9AE23D29D4A2AF007A103B /* nthunga.infinityfreeapp.com in Resources */,
+				EC9AE23D29D4A2AF007A103B /* localassets in Resources */,
 				ECAF252129C9AF720020F822 /* LaunchScreen.storyboard in Resources */,
 				ECAF251E29C9AF720020F822 /* Assets.xcassets in Resources */,
 				ECA96D1F29DDAA230064E36A /* tempfolder in Resources */,
